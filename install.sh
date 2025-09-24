@@ -9,7 +9,20 @@ if ! command -v python3 &> /dev/null; then
 fi
 
 # --- ติดตั้ง Chromium และ Chromium driver ---
-sudo apt update && sudo apt install -y chromium chromium-driver
+echo "Installing Chromium and Chromedriver..."
+sudo apt update
+sudo apt install -y chromium-browser chromium-chromedriver
+
+# --- ตรวจสอบว่า chromium และ chromedriver ติดตั้งถูกต้องหรือไม่ ---
+echo "Checking installed versions..."
+chromium-browser --version
+chromedriver --version
+
+# --- สร้าง symlink ถ้าจำเป็น เพื่อให้ selenium หา chromium เจอ ---
+if [ ! -f "/usr/bin/chromium" ]; then
+    echo "Creating symlink for chromium binary..."
+    sudo ln -s /usr/bin/chromium-browser /usr/bin/chromium
+fi
 
 # --- ตรวจสอบไฟล์ bypasswaf.py ---
 SCRIPT_NAME="bypasswaf.py"
@@ -20,7 +33,6 @@ if [ ! -f "$SCRIPT_NAME" ]; then
 fi
 
 # --- แปลงไฟล์ Python จาก CRLF (Windows) เป็น LF (Linux) ---
-# ใช้ dos2unix เฉพาะเปลี่ยน line ending เท่านั้น
 echo "Converting line endings to Linux format..."
 dos2unix "$SCRIPT_NAME"
 
