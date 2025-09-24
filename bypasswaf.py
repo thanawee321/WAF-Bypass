@@ -30,7 +30,7 @@ options.add_argument("--disable-dev-shm-usage")
 ###############BANNER###############
 class INFO:
     
-    version = "2.2"
+    version = "2.1.1"
     """Update 
     1. fix bug save file
     """
@@ -640,6 +640,10 @@ def main():
 
 
 if __name__ == '__main__':
+    if os.getuid() !=0:
+        print(f"{Fore.RED} Please run as '{Fore.YELLOW}sudo{Fore.RESET}{Fore.RED}' only")
+        sys.exit(1)
+        
     main()
 
 
