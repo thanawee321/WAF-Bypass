@@ -39,9 +39,10 @@ This tool is suitable for Bug Bounty hunters, Pentesters, and Security Researche
 - Supports **custom wordlists** or download the latest wordlists from GitHub
   
 ---
-## 🚀 What's New update Version 2.2
+## 🚀 What's New update Version 2.1.1
 
-- Fix bug save config file
+- Fixed bug related to saving configuration files
+- warning message to notify users that the tool must be executed with SUDO privileges for proper functionality
 ---
 ## 🚀 What's update Version 2.1
 
