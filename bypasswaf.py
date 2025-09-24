@@ -469,7 +469,7 @@ def find_subdomains_with_ssl_analysis(domain,wordlists_path_updated,worker=50):
         
         
     print(f"{Fore.GREEN}[+] Wordlists file {Fore.RESET}{wordlists_path_updated}")
-    with open(wordlists_path_updated) as file:
+    with open(wordlists_path_updated,"r",encoding='utf-8',errors='ignore') as file:
         subdomains = [line.strip() for line in file.readlines()]
         
         
