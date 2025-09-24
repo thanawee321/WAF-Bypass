@@ -6,7 +6,7 @@ import requests
 import urllib.request
 import random
 import argparse
-
+import tempfile
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -26,6 +26,10 @@ options = Options()
 options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
+
+ # temporary user-data-dir สำหรับ session นี้
+unique_profile = tempfile.mkdtemp(prefix="selenium_profile_")
+options.add_argument(f"--user-data-dir={unique_profile}")
 
 ###############BANNER###############
 class INFO:
