@@ -24,14 +24,6 @@ fi
 echo "Converting line endings to Linux format..."
 dos2unix "$SCRIPT_NAME"
 
-# --- สร้างโฟลเดอร์สำหรับไฟล์ Config และ Wordlists ---
-SHARE_DIR="/usr/local/share/bypasswaf"
-if [ ! -d "$SHARE_DIR" ]; then
-    echo "Creating shared directory at $SHARE_DIR ..."
-    sudo mkdir -p "$SHARE_DIR"
-    sudo chown "$USER":"$USER" "$SHARE_DIR"
-fi
-
 # --- สร้าง Virtual Environment ---
 VENV_DIR="$HOME/.bypasswaf-env"
 if [ ! -d "$VENV_DIR" ]; then
@@ -57,7 +49,6 @@ sudo chmod +x $WRAPPER
 # --- สรุปผลการติดตั้ง ---
 echo ""
 echo "Installation completed!"
-echo "Shared data directory created at: $SHARE_DIR"
 echo "You can now run 'bypasswaf' from any terminal without modifying bypasswaf.py."
 echo "Virtual environment is stored at: $VENV_DIR"
 echo ""

@@ -5,7 +5,6 @@ echo "Starting bypasswaf uninstallation..."
 # --- กำหนดค่าพื้นฐาน ---
 VENV_DIR="$HOME/.bypasswaf-env"
 SCRIPT_LINK="/usr/local/bin/bypasswaf"
-INSTALL_DIR="/usr/local/share/bypasswaf"
 
 # --- ยืนยันก่อนลบ ---
 read -p "Are you sure you want to uninstall bypasswaf? (y/N): " confirm
@@ -28,14 +27,6 @@ if [ -d "$VENV_DIR" ]; then
     rm -rf "$VENV_DIR"
 else
     echo "Virtual environment not found at $VENV_DIR. Skipping..."
-fi
-
-# --- ลบโฟลเดอร์ติดตั้งโปรแกรมหลัก ---
-if [ -d "$INSTALL_DIR" ]; then
-    echo "Removing program files at $INSTALL_DIR ..."
-    sudo rm -rf "$INSTALL_DIR"
-else
-    echo "Program folder not found at $INSTALL_DIR. Skipping..."
 fi
 
 # --- สรุปผล ---

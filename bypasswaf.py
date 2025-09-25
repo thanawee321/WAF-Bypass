@@ -6,7 +6,7 @@ import requests
 import urllib.request
 import random
 import argparse
-import tempfile
+
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -16,6 +16,7 @@ import time
 from bs4 import BeautifulSoup
 import configparser
 from urllib.parse import urlparse
+from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -27,25 +28,31 @@ options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
-
 ###############BANNER###############
 class INFO:
     
-    version = "2.1.1"
+    version = "2.1"
     """Update 
-    1. fix bug save file
+    1. input thread 
+    2. stop event for thread 
+    3. Performance
+    4. fixbug color and text infomation
+    5. show status code not response 200
+    6. Update can't not detected but can be scansubdomain
+    7. Fix bug update wordlists
+    8. Waring over threading
     """
     dev_by = "BabyH@ck"
     facebook = "https://www.facebook.com/thanawee321"
     youtube = "https://www.youtube.com/@BabyHackSenior"
-    default_path_install_file = "/usr/local/share/bypasswaf"
-    namefile = os.path.join(default_path_install_file,"config.ini")
+    namefile = str('config.ini')
+    
+    config_path_install = Path("/usr/local/share/bypasswaf/config")
     
     wordlist_url = "https://raw.githubusercontent.com/reewardius/bbDomains.txt/refs/heads/main/bug-bounty-program-subdomains-trickest-inventory.txt"
-    default_wordlists = os.path.join(default_path_install_file,"wordlists.txt")
-    updated_wordlists = os.path.join(default_path_install_file,"wordlists.txt")
-    
-    
+    namefile = os.path.join(config_path_install,'config.ini')
+    default_wordlists = os.path.join(config_path_install,'wordlists.txt')
+    updated_wordlists = os.path.join(config_path_install,'wordlists.txt')
 
     
 def banner():
@@ -255,7 +262,7 @@ def get_domain_historical_ip_address(domain):
     try:
         
         
-        driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome()
         driver.get(f"https://viewdns.info/iphistory/?domain={domain}")
         
         print(f"{Fore.GREEN}[+] Fetching historical IP data for {Fore.RESET}{domain} ...")
@@ -363,7 +370,7 @@ def select_historical_memu(domain):
 
 ###########DOWNLOAD_WORDLISTS#############
 def download_wordlists(wordlists_path):
-    wordlists_url = INFO().wordlist_url
+    wordlists_url = INFO().wordlist_url 
     updated_wordlists = INFO().updated_wordlists
     default_wordlists = INFO().default_wordlists
     try:
@@ -372,7 +379,6 @@ def download_wordlists(wordlists_path):
         
             urllib.request.urlretrieve(wordlists_url,wordlists_path)
             print(f"{Fore.GREEN}[+] Wordlist downloaded successfully as {Fore.WHITE}{wordlists_path}{Fore.RESET}")
-            
             return updated_wordlists
         else:
             if input(f"{Fore.BLUE}[!] Do you want update Wordlists from {Fore.WHITE}reewardius{Fore.RESET}? {Fore.YELLOW}(Y/n) : {Fore.RESET}").lower() == 'y':
@@ -470,7 +476,7 @@ def find_subdomains_with_ssl_analysis(domain,wordlists_path_updated,worker=50):
         
         
     print(f"{Fore.GREEN}[+] Wordlists file {Fore.RESET}{wordlists_path_updated}")
-    with open(wordlists_path_updated,"r",encoding='utf-8',errors='ignore') as file:
+    with open(wordlists_path_updated) as file:
         subdomains = [line.strip() for line in file.readlines()]
         
         
@@ -581,7 +587,6 @@ def main():
         tech = detected_web_server(domain)
         
         wordlists_path = INFO().default_wordlists
-        
         if waf_status:
             
             print(f"{Fore.GREEN}[+] WAF Detected : {Fore.RESET}{",".join(waf_info['waf_list'])}")
@@ -596,7 +601,6 @@ def main():
                 custom_path_wordlists = args.wordlists
                 if not os.path.exists(custom_path_wordlists):
                     print(f"{Fore.RED}[-] Wordlists file {Fore.RESET}{custom_path_wordlists}{Fore.RED} not found!!!{Fore.RESET}\n")
-
                     wordlists_path_updated = download_wordlists(wordlists_path)
                     find_subdomains_with_ssl_analysis(domain,wordlists_path_updated,worker)
                 
@@ -641,11 +645,30 @@ def main():
 
 
 if __name__ == '__main__':
-    if os.getuid() !=0:
-        print(f"{Fore.RED} Please run as '{Fore.YELLOW}sudo{Fore.RESET}{Fore.RED}' only")
+    
+    if os.getuid() != 0:
+        print(f"{Fore.RED}[-] PLEASE RAN AS {Fore.YELLOW}'sudo'{Fore.RESET} FIRST!!")
         sys.exit(1)
-       
-    main()
+    else:
+        path_config = INFO().config_path_install
+        
+        if path_config.exists():
+            pass
+        else:
+            try:
+                path_config.mkdir(parents=True)
+                print(f"{Fore.GREEN}[+] Create config folder successfuly!!{Fore.RESET}")
+                
+            except PermissionError:
+                print(f"{Fore.RED}[-] PLEASE RAN AS {Fore.YELLOW}'sudo'{Fore.RESET} FIRST!!")
+                sys.exit(1)
+                
+            except Exception as e:
+                print(f"{Fore.RED}[-] ERROR : {Fore.RESET}{e}")
+                sys.exit(1)
+                    
+        main()
+    
 
 
 
