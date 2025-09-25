@@ -9,20 +9,7 @@ if ! command -v python3 &> /dev/null; then
 fi
 
 # --- ติดตั้ง Chromium และ Chromium driver ---
-echo "Installing Chromium and Chromedriver..."
-sudo apt update
-sudo apt install -y chromium-browser chromium-chromedriver
-
-# --- ตรวจสอบว่า chromium และ chromedriver ติดตั้งถูกต้องหรือไม่ ---
-echo "Checking installed versions..."
-chromium-browser --version
-chromedriver --version
-
-# --- สร้าง symlink ถ้าจำเป็น เพื่อให้ selenium หา chromium เจอ ---
-if [ ! -f "/usr/bin/chromium" ]; then
-    echo "Creating symlink for chromium binary..."
-    sudo ln -s /usr/bin/chromium-browser /usr/bin/chromium
-fi
+sudo apt update && sudo apt install -y chromium chromium-driver
 
 # --- ตรวจสอบไฟล์ bypasswaf.py ---
 SCRIPT_NAME="bypasswaf.py"
@@ -33,16 +20,17 @@ if [ ! -f "$SCRIPT_NAME" ]; then
 fi
 
 # --- แปลงไฟล์ Python จาก CRLF (Windows) เป็น LF (Linux) ---
+# ใช้ dos2unix เฉพาะเปลี่ยน line ending เท่านั้น
 echo "Converting line endings to Linux format..."
 dos2unix "$SCRIPT_NAME"
 
-# --- สร้างโฟลเดอร์สำหรับติดตั้งโปรแกรม ---
-INSTALL_DIR="/usr/local/share/bypasswaf"
-sudo mkdir -p "$INSTALL_DIR"
-
-# --- ย้ายไฟล์โปรแกรมหลักไปยัง INSTALL_DIR ---
-echo "Moving bypasswaf.py to $INSTALL_DIR ..."
-sudo cp "$SCRIPT_NAME" "$INSTALL_DIR/"
+# --- สร้างโฟลเดอร์สำหรับไฟล์ Config และ Wordlists ---
+SHARE_DIR="/usr/local/share/bypasswaf"
+if [ ! -d "$SHARE_DIR" ]; then
+    echo "Creating shared directory at $SHARE_DIR ..."
+    sudo mkdir -p "$SHARE_DIR"
+    sudo chown "$USER":"$USER" "$SHARE_DIR"
+fi
 
 # --- สร้าง Virtual Environment ---
 VENV_DIR="$HOME/.bypasswaf-env"
@@ -62,16 +50,15 @@ deactivate
 WRAPPER="/usr/local/bin/bypasswaf"
 echo "#!/bin/bash" | sudo tee $WRAPPER > /dev/null
 echo "source \"$VENV_DIR/bin/activate\"" | sudo tee -a $WRAPPER > /dev/null
-echo "python \"$INSTALL_DIR/$SCRIPT_NAME\" \"\$@\"" | sudo tee -a $WRAPPER > /dev/null
+echo "python \"$(pwd)/$SCRIPT_NAME\" \"\$@\"" | sudo tee -a $WRAPPER > /dev/null
 echo "deactivate" | sudo tee -a $WRAPPER > /dev/null
 sudo chmod +x $WRAPPER
 
 # --- สรุปผลการติดตั้ง ---
 echo ""
 echo "Installation completed!"
+echo "Shared data directory created at: $SHARE_DIR"
 echo "You can now run 'bypasswaf' from any terminal without modifying bypasswaf.py."
-echo ""
-echo "Program installed to: $INSTALL_DIR"
 echo "Virtual environment is stored at: $VENV_DIR"
 echo ""
 echo "Example usage:"

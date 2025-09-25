@@ -21,12 +21,12 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-unique_profile = tempfile.mkdtemp(prefix="selenium_profile_")
+
 options = Options()
 options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
-options.add_argument(f"--user-data-dir={unique_profile}")
+
 
 ###############BANNER###############
 class INFO:
@@ -641,10 +641,10 @@ def main():
 
 
 if __name__ == '__main__':
-    """if os.getuid() !=0:
+    if os.getuid() !=0:
         print(f"{Fore.RED} Please run as '{Fore.YELLOW}sudo{Fore.RESET}{Fore.RED}' only")
         sys.exit(1)
-    """    
+       
     main()
 
 
